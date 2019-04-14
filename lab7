@@ -1,0 +1,174 @@
+XML code-
+
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text=""
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.08"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.134"/>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Read"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.638"
+        app:layout_constraintStart_toEndOf="@id/editText"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.13"/>
+
+    <EditText
+        android:id="@+id/editText2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text=""
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.08"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/editText"
+        app:layout_constraintVertical_bias="0.169"/>
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.638"
+        app:layout_constraintStart_toEndOf="@id/editText2"
+        app:layout_constraintTop_toBottomOf="@id/button"
+        app:layout_constraintVertical_bias="0.17"/>
+
+
+
+</android.support.constraint.ConstraintLayout>
+
+Java code-
+
+package com.example.sd;
+
+import android.content.SharedPreferences;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        final EditText e1=(EditText)findViewById(R.id.editText);
+        final EditText e2=(EditText)findViewById(R.id.editText2);
+        Button b1=(Button)findViewById(R.id.button);
+        Button b2=(Button) findViewById(R.id.button2);
+        String path=getPreferences(MODE_PRIVATE).getString("fpath","/sdcard/file3");
+        e1.setText(path);
+        b1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                File f= new File(e1.getText().toString());
+                String s="";
+                StringBuilder sb=new StringBuilder();
+                FileReader fr= null;
+                try{
+                    fr=new FileReader(f);
+                }catch(FileNotFoundException e){
+                    e.printStackTrace();
+                }
+                BufferedReader br=new BufferedReader(fr);
+                try {
+                    while ((s=br.readLine())!=null){
+                        sb.append(s+"\n");
+                    }
+                }catch(IOException e){
+                    e.printStackTrace();
+                }
+                Toast.makeText(getApplicationContext(),"File Read Successfully!!!",Toast.LENGTH_LONG).show();
+                e2.setText(sb);
+            }
+        });
+        b2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                File f=new File(e1.getText().toString());
+                FileWriter fw=null;
+                try {
+                    fw=new FileWriter(f);
+                }catch(IOException e3){
+                    e3.printStackTrace();
+                }
+                try{
+                    fw.write(e2.getText().toString());
+                }catch(IOException e2){
+                    e2.printStackTrace();
+                }
+                try{
+                    fw.close();
+                }catch (IOException e2){
+                    e2.printStackTrace();
+                }
+                SharedPreferences.Editor e=getPreferences(MODE_PRIVATE).edit();
+                e.putString("fpath",f.getPath());
+                e.commit();
+                Toast.makeText(getApplicationContext(),"Saved Successfully!!!",Toast.LENGTH_LONG).show();
+
+            }
+        });
+    }
+}
+
+Manifest.xml-
+
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.sd">
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
